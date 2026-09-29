@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechTree & Route Logistics | Discrete Math Project</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #0f172a;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #334155;
+            --accent: #10b981;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header & Nav */
+        header {
+            background-color: var(--secondary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1rem;
+        }
+
+        nav button {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        nav button:hover, nav button.active {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* Main Container */
+        main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .page {
+            display: none;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        h1, h2, h3 {
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+
+        /* Products Grid (Page 1) */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .product-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .product-img {
+            width: 100%;
+            height: 150px;
+            background: #e2e8f0;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Controls & Interactive Panels */
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-accent {
+            background: var(--accent);
+        }
+
+        .btn-accent:hover {
+            background: #059669;
+        }
+
+        /* SVG Visualization Canvas */
+        .svg-container {
+            width: 100%;
+            height: 420px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #f1f5f9;
+            margin-top: 1rem;
+        }
+
+        /* Output Box */
+        .output-box {
+            background: #1e293b;
+            color: #38bdf8;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+            margin-top: 1rem;
+            white-space: pre-wrap;
+            min-height: 80px;
+        }
+
+        /* Info Badge List */
+        .badge-list {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 0.5rem 0;
+        }
+
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-root { background: #fef3c7; color: #d97706; }
+        .badge-parent { background: #dbeafe; color: #2563eb; }
+        .badge-leaf { background: #d1fae5; color: #059669; }
+
+        footer {
+            background: var(--secondary);
+            color: #94a3b8;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: auto;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header & Navigation Bar -->
+    <header>
+        <div class="logo-container">
+            <div class="logo-icon">IT</div>
+            <div>
+                <h3 style="color: white; margin: 0;">TechStore & Logistics</h3>
+                <small style="color: #94a3b8;">Discrete Math Interactive Web Application</small>
+            </div>
+        </div>
+        <nav>
+            <ul>
+                <li><button class="nav-btn active" onclick="switchPage('page1')">1. หน้าหลัก & สินค้า</button></li>
+                <li><button class="nav-btn" onclick="switchPage('page2')">2. หมวดหมู่ (Tree)</button></li>
+                <li><button class="nav-btn" onclick="switchPage('page3')">3. เส้นทางส่งสินค้า (Graph)</button></li>
+                <li><button class="nav-btn" onclick="switchPage('page4')">4. สรุปทฤษฎี</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- PAGE 1: Home & Products -->
+        <section id="page1" class="page active">
+            <h2>ยินดีต้อนรับสู่ TechStore Smart System</h2>
+            <p>ระบบบริหารจัดการร้านค้าไอทีและค้นหาเส้นทางจัดส่งสินค้า ประยุกต์ใช้ทฤษฎีกราฟและโครงสร้างต้นไม้</p>
+            
+            <h3 style="margin-top: 2rem;">รายการสินค้าเด่นในระบบ</h3>
+            <div class="product-grid">
+                <div class="product-card">
+                    <div class="product-img">💻</div>
+                    <h4>Gaming Laptop V1</h4>
+                    <p>หมวดหมู่: Hardware</p>
+                    <p style="color: var(--primary); font-weight: bold; margin-top: 0.5rem;">35,900 ฿</p>
+                </div>
+                <div class="product-card">
+                    <div class="product-img">🖥️</div>
+                    <h4>GPU RTX 4070</h4>
+                    <p>หมวดหมู่: Hardware</p>
+                    <p style="color: var(--primary); font-weight: bold; margin-top: 0.5rem;">22,500 ฿</p>
+                </div>
+                <div class="product-card">
+                    <div class="product-img">🖱️</div>
+                    <h4>Wireless Mouse</h4>
+                    <p>หมวดหมู่: Accessories</p>
+                    <p style="color: var(--primary); font-weight: bold; margin-top: 0.5rem;">1,290 ฿</p>
+                </div>
+                <div class="product-card">
+                    <div class="product-img">⌨️</div>
+                    <h4>Mechanical Keyboard</h4>
+                    <p>หมวดหมู่: Accessories</p>
+                    <p style="color: var(--primary); font-weight: bold; margin-top: 0.5rem;">2,890 ฿</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 2: Tree Structure & Categories -->
+        <section id="page2" class="page">
+            <h2>โครงสร้างหมวดหมู่สินค้า (Tree Structure - 3 ระดับ)</h2>
+            <p>ระบบการจัดหมวดหมู่แบบลำดับขั้น (Hierarchical Catalog):</p>
+            
+            <div class="badge-list" style="margin-top: 1rem;">
+                <span class="badge badge-root">Root (ระดับ 0): All Products</span>
+                <span class="badge badge-parent">Parent (ระดับ 1): Hardware, Accessories, Software</span>
+                <span class="badge badge-leaf">Leaf (ระดับ 2): Laptop, GPU, Mouse, Keyboard, OS, Office</span>
+            </div>
+
+            <div class="controls">
+                <button class="btn" onclick="runTreeTraversal('preorder')">Preorder Traversal</button>
+                <button class="btn" onclick="runTreeTraversal('postorder')">Postorder Traversal</button>
+                <button class="btn" onclick="runTreeTraversal('bfs')">BFS (Level Order)</button>
+                <button class="btn btn-accent" onclick="showTreePath()">แสดง Path จาก Root ไป Leaf</button>
+            </div>
+
+            <!-- SVG Tree Canvas -->
+            <svg class="svg-container" id="treeSvg" viewBox="0 0 800 380"></svg>
+
+            <div class="output-box" id="treeOutput">คลิกปุ่มด้านบน เพื่อทดสอบการท่องโครงสร้างต้นไม้ (Tree Traversal)...</div>
+        </section>
+
+        <!-- PAGE 3: Graph Logistics -->
+        <section id="page3" class="page">
+            <h2>ระบบค้นหาเส้นทางจัดส่งสินค้า (Graph Theory Logistics)</h2>
+            <p>จำลองเครือข่ายศูนย์กระจายสินค้าและสาขา (Vertex = 6 จุด, Edge = 8 เส้นทาง):</p>
+
+            <div class="controls">
+                <label for="startNode"><strong>จุดเริ่มต้น:</strong></label>
+                <select id="startNode" style="padding: 0.5rem; border-radius: 4px;">
+                    <option value="Central Hub">Central Hub (คลังใหญ่)</option>
+                    <option value="Lat Phrao">Lat Phrao</option>
+                    <option value="Siam">Siam</option>
+                    <option value="Bangna">Bangna</option>
+                    <option value="Rangsit">Rangsit</option>
+                    <option value="Rama 2">Rama 2</option>
+                </select>
+
+                <label for="endNode"><strong>ปลายทาง:</strong></label>
+                <select id="endNode" style="padding: 0.5rem; border-radius: 4px;">
+                    <option value="Rama 2">Rama 2</option>
+                    <option value="Rangsit">Rangsit</option>
+                    <option value="Siam">Siam</option>
+                    <option value="Bangna">Bangna</option>
+                    <option value="Lat Phrao">Lat Phrao</option>
+                </select>
+
+                <button class="btn" onclick="findRoute('dfs')">ค้นหาด้วย DFS</button>
+                <button class="btn" onclick="findRoute('bfs')">ค้นหาด้วย BFS</button>
+                <button class="btn btn-accent" onclick="findRoute('shortest')">หาเส้นทางสั้นสุด (Shortest Path)</button>
+            </div>
+
+            <!-- SVG Graph Canvas -->
+            <svg class="svg-container" id="graphSvg" viewBox="0 0 800 380"></svg>
+
+            <div class="output-box" id="graphOutput">เลือกจุดเริ่มต้นและปลายทาง แล้วกดปุ่มเพื่อประมวลผลเส้นทาง...</div>
+        </section>
+
+        <!-- PAGE 4: Theory & Code Documentation -->
+        <section id="page4" class="page">
+            <h2>สรุปทฤษฎี Discrete Mathematics & Source Code</h2>
+            
+            <h3>1. ทฤษฎีกราฟ (Graph Theory Specification)</h3>
+            <ul>
+                <li><strong>Vertex (จุดยอด 6 จุด):</strong> แทนศูนย์กระจายสินค้าและสาขา ได้แก่ Central Hub, Lat Phrao, Siam, Bangna, Rangsit, Rama 2</li>
+                <li><strong>Edge (เส้นเชื่อม 8 เส้น):</strong> แทนเส้นทางขนส่งระหว่างสาขา พร้อมค่าน้ำหนัก (Weight = ระยะทาง km)</li>
+                <li><strong>Path (เส้นทาง):</strong> เส้นทางลำดับการจัดส่ง เช่น Central Hub &rarr; Siam &rarr; Rama 2</li>
+            </ul>
+
+            <h4 style="margin-top: 1rem;">Adjacency List ในรูปแบบ JavaScript:</h4>
+            <div class="output-box" style="color: #a7f3d0;">
+const graph = {
+  "Central Hub": [ {node: "Lat Phrao", weight: 12}, {node: "Siam", weight: 8}, {node: "Bangna", weight: 20} ],
+  "Lat Phrao":   [ {node: "Central Hub", weight: 12}, {node: "Rangsit", weight: 15} ],
+  "Siam":        [ {node: "Central Hub", weight: 8}, {node: "Rama 2", weight: 18}, {node: "Bangna", weight: 10} ],
+  "Bangna":      [ {node: "Central Hub", weight: 20}, {node: "Siam", weight: 10}, {node: "Rama 2", weight: 25} ],
+  "Rangsit":     [ {node: "Lat Phrao", weight: 15} ],
+  "Rama 2":      [ {node: "Siam", weight: 18}, {node: "Bangna", weight: 25} ]
+};
+            </div>
+
+            <h3 style="margin-top: 1.5rem;">2. โครงสร้างต้นไม้ (Tree Theory Specification)</h3>
+            <ul>
+                <li><strong>Root:</strong> All Products (ระดับ 0)</li>
+                <li><strong>Parent Nodes:</strong> Hardware, Accessories, Software (ระดับ 1)</li>
+                <li><strong>Child / Leaf Nodes:</strong> Laptop, GPU, Mouse, Keyboard, OS, Office (ระดับ 2)</li>
+                <li><strong>ความสูงของ Tree:</strong> 3 ระดับ (Levels 0, 1, 2)</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>โครงงานเดี่ยว วิชาคณิตศาสตร์ดิสครีตสำหรับนักศึกษาเทคโนโลยีสารสนเทศ | พัฒนาด้วย HTML, CSS & JavaScript</p>
+    </footer>
+
+    <script>
+        // --- PAGE SWITCHING NAVIGATION ---
+        function switchPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(pageId).classList.add('active');
+            event.currentTarget.classList.add('active');
+
+            if(pageId === 'page2') renderTree();
+            if(pageId === 'page3') renderGraph();
+        }
+
+        // ==========================================
+        // 1. TREE DATA STRUCTURE & LOGIC
+        // ==========================================
+        const treeData = {
+            name: "All Products",
+            type: "Root",
+            children: [
+                {
+                    name: "Hardware",
+                    type: "Parent",
+                    children: [
+                        { name: "Laptop", type: "Leaf" },
+                        { name: "GPU", type: "Leaf" }
+                    ]
+                },
+                {
+                    name: "Accessories",
+                    type: "Parent",
+                    children: [
+                        { name: "Mouse", type: "Leaf" },
+                        { name: "Keyboard", type: "Leaf" }
+                    ]
+                },
+                {
+                    name: "Software",
+                    type: "Parent",
+                    children: [
+                        { name: "OS", type: "Leaf" },
+                        { name: "Office", type: "Leaf" }
+                    ]
+                }
+            ]
+        };
+
+        function renderTree(highlightNodes = []) {
+            const svg = document.getElementById('treeSvg');
+            svg.innerHTML = ''; // Clear canvas
+
+            // Fixed layout coordinates for 3-level tree
+            const positions = {
+                "All Products": { x: 400, y: 50 },
+                "Hardware": { x: 200, y: 170 },
+                "Accessories": { x: 400, y: 170 },
+                "Software": { x: 600, y: 170 },
+                "Laptop": { x: 140, y: 300 },
+                "GPU": { x: 260, y: 300 },
+                "Mouse": { x: 340, y: 300 },
+                "Keyboard": { x: 460, y: 300 },
+                "OS": { x: 540, y: 300 },
+                "Office": { x: 660, y: 300 }
+            };
+
+            // Draw Edges
+            const drawLines = (node) => {
+                if (node.children) {
+                    node.children.forEach(child => {
+                        const p1 = positions[node.name];
+                        const p2 = positions[child.name];
+                        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                        line.setAttribute("x1", p1.x);
+                        line.setAttribute("y1", p1.y);
+                        line.setAttribute("x2", p2.x);
+                        line.setAttribute("y2", p2.y);
+                        line.setAttribute("stroke", "#94a3b8");
+                        line.setAttribute("stroke-width", "2");
+                        svg.appendChild(line);
+                        drawLines(child);
+                    });
+                }
+            };
+            drawLines(treeData);
+
+            // Draw Nodes
+            Object.keys(positions).forEach(name => {
+                const pos = positions[name];
+                const isHighlighted = highlightNodes.includes(name);
+
+                const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", pos.x);
+                circle.setAttribute("cy", pos.y);
+                circle.setAttribute("r", 25);
+                circle.setAttribute("fill", isHighlighted ? "#f59e0b" : "#2563eb");
+                circle.setAttribute("stroke", "#ffffff");
+                circle.setAttribute("stroke-width", "3");
+
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", pos.x);
+                text.setAttribute("y", pos.y + 40);
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("font-size", "13px");
+                text.setAttribute("font-weight", "bold");
+                text.setAttribute("fill", "#1e293b");
+                text.textContent = name;
+
+                g.appendChild(circle);
+                g.appendChild(text);
+                svg.appendChild(g);
+            });
+        }
+
+        // Tree Traversals
+        function runTreeTraversal(type) {
+            let result = [];
+            
+            if (type === 'preorder') {
+                function preorder(node) {
+                    if (!node) return;
+                    result.push(node.name);
+                    if (node.children) node.children.forEach(preorder);
+                }
+                preorder(treeData);
+                document.getElementById('treeOutput').innerText = `Preorder Traversal (Root -> Left -> Right):\n${result.join('  ➔  ')}`;
+            } 
+            else if (type === 'postorder') {
+                function postorder(node) {
+                    if (!node) return;
+                    if (node.children) node.children.forEach(postorder);
+                    result.push(node.name);
+                }
+                postorder(treeData);
+                document.getElementById('treeOutput').innerText = `Postorder Traversal (Left -> Right -> Root):\n${result.join('  ➔  ')}`;
+            } 
+            else if (type === 'bfs') {
+                let queue = [treeData];
+                while(queue.length > 0) {
+                    let curr = queue.shift();
+                    result.push(curr.name);
+                    if (curr.children) {
+                        curr.children.forEach(c => queue.push(c));
+                    }
+                }
+                document.getElementById('treeOutput').innerText = `BFS Traversal (Level-Order):\n${result.join('  ➔  ')}`;
+            }
+
+            renderTree(result);
+        }
+
+        function showTreePath() {
+            const path = ["All Products", "Hardware", "Laptop"];
+            document.getElementById('treeOutput').innerText = `Path จาก Root ไปยัง Leaf:\nRoot [All Products] ➔ Parent [Hardware] ➔ Leaf [Laptop]`;
+            renderTree(path);
+        }
+
+
+        // ==========================================
+        // 2. GRAPH DATA STRUCTURE & LOGIC
+        // ==========================================
+        const graphNodes = {
+            "Central Hub": { x: 400, y: 190 },
+            "Lat Phrao":   { x: 260, y: 80 },
+            "Rangsit":     { x: 120, y: 190 },
+            "Siam":        { x: 540, y: 90 },
+            "Bangna":      { x: 650, y: 250 },
+            "Rama 2":      { x: 380, y: 320 }
+        };
+
+        const graphAdjacency = {
+            "Central Hub": [ {node: "Lat Phrao", weight: 12}, {node: "Siam", weight: 8}, {node: "Bangna", weight: 20} ],
+            "Lat Phrao":   [ {node: "Central Hub", weight: 12}, {node: "Rangsit", weight: 15} ],
+            "Siam":        [ {node: "Central Hub", weight: 8}, {node: "Rama 2", weight: 18}, {node: "Bangna", weight: 10} ],
+            "Bangna":      [ {node: "Central Hub", weight: 20}, {node: "Siam", weight: 10}, {node: "Rama 2", weight: 25} ],
+            "Rangsit":     [ {node: "Lat Phrao", weight: 15} ],
+            "Rama 2":      [ {node: "Siam", weight: 18}, {node: "Bangna", weight: 25} ]
+        };
+
+        const edges = [
+            { u: "Central Hub", v: "Lat Phrao", w: 12 },
+            { u: "Central Hub", v: "Siam", w: 8 },
+            { u: "Central Hub", v: "Bangna", w: 20 },
+            { u: "Lat Phrao", v: "Rangsit", w: 15 },
+            { u: "Siam", v: "Rama 2", w: 18 },
+            { u: "Siam", v: "Bangna", w: 10 },
+            { u: "Bangna", v: "Rama 2", w: 25 }
+        ];
+
+        function renderGraph(highlightPath = []) {
+            const svg = document.getElementById('graphSvg');
+            svg.innerHTML = '';
+
+            // Draw Edges
+            edges.forEach(e => {
+                const u = graphNodes[e.u];
+                const v = graphNodes[e.v];
+
+                let isHighlighted = false;
+                for (let i = 0; i < highlightPath.length - 1; i++) {
+                    if ((highlightPath[i] === e.u && highlightPath[i+1] === e.v) || 
+                        (highlightPath[i] === e.v && highlightPath[i+1] === e.u)) {
+                        isHighlighted = true;
+                        break;
+                    }
+                }
+
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", u.x);
+                line.setAttribute("y1", u.y);
+                line.setAttribute("x2", v.x);
+                line.setAttribute("y2", v.y);
+                line.setAttribute("stroke", isHighlighted ? "#ef4444" : "#cbd5e1");
+                line.setAttribute("stroke-width", isHighlighted ? "5" : "2");
+                svg.appendChild(line);
+
+                // Weight Label
+                const midX = (u.x + v.x) / 2;
+                const midY = (u.y + v.y) / 2;
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", midX);
+                text.setAttribute("y", midY - 5);
+                text.setAttribute("fill", "#64748b");
+                text.setAttribute("font-size", "12px");
+                text.setAttribute("font-weight", "bold");
+                text.textContent = `${e.w} km`;
+                svg.appendChild(text);
+            });
+
+            // Draw Vertices
+            Object.keys(graphNodes).forEach(name => {
+                const pos = graphNodes[name];
+                const isHighlighted = highlightPath.includes(name);
+
+                const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", pos.x);
+                circle.setAttribute("cy", pos.y);
+                circle.setAttribute("r", 22);
+                circle.setAttribute("fill", isHighlighted ? "#ef4444" : "#10b981");
+                circle.setAttribute("stroke", "#ffffff");
+                circle.setAttribute("stroke-width", "3");
+
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", pos.x);
+                text.setAttribute("y", pos.y + 38);
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("font-size", "13px");
+                text.setAttribute("font-weight", "bold");
+                text.setAttribute("fill", "#0f172a");
+                text.textContent = name;
+
+                g.appendChild(circle);
+                g.appendChild(text);
+                svg.appendChild(g);
+            });
+        }
+
+        function findRoute(algo) {
+            const start = document.getElementById('startNode').value;
+            const end = document.getElementById('endNode').value;
+            const output = document.getElementById('graphOutput');
+
+            if (start === end) {
+                output.innerText = "จุดเริ่มต้นและปลายทางเป็นจุดเดียวกัน!";
+                renderGraph([start]);
+                return;
+            }
+
+            let path = [];
+
+            if (algo === 'bfs') {
+                path = bfsGraph(start, end);
+                output.innerText = `เส้นทางจัดส่งสินค้าด้วย BFS (${start} ➔ ${end}):\n${path.join('  ➔  ')}`;
+            } else if (algo === 'dfs') {
+                path = dfsGraph(start, end);
+                output.innerText = `เส้นทางจัดส่งสินค้าด้วย DFS (${start} ➔ ${end}):\n${path.join('  ➔  ')}`;
+            } else if (algo === 'shortest') {
+                let res = dijkstra(start, end);
+                path = res.path;
+                output.innerText = `เส้นทางสั้นที่สุด (Shortest Path - Dijkstra):\n${path.join('  ➔  ')}\nระยะทางรวม: ${res.distance} กิโลเมตร`;
+            }
+
+            renderGraph(path);
+        }
+
+        // BFS Search on Graph
+        function bfsGraph(start, end) {
+            let queue = [[start]];
+            let visited = new Set([start]);
+
+            while (queue.length > 0) {
+                let path = queue.shift();
+                let node = path[path.length - 1];
+
+                if (node === end) return path;
+
+                for (let neighborObj of graphAdjacency[node]) {
+                    let neighbor = neighborObj.node;
+                    if (!visited.has(neighbor)) {
+                        visited.add(neighbor);
+                        queue.push([...path, neighbor]);
+                    }
+                }
+            }
+            return [];
+        }
+
+        // DFS Search on Graph
+        function dfsGraph(start, end) {
+            let stack = [[start]];
+            let visited = new Set();
+
+            while (stack.length > 0) {
+                let path = stack.pop();
+                let node = path[path.length - 1];
+
+                if (node === end) return path;
+
+                if (!visited.has(node)) {
+                    visited.add(node);
+                    for (let neighborObj of graphAdjacency[node]) {
+                        let neighbor = neighborObj.node;
+                        if (!visited.has(neighbor)) {
+                            stack.push([...path, neighbor]);
+                        }
+                    }
+                }
+            }
+            return [];
+        }
+
+        // Dijkstra's Algorithm for Shortest Path
+        function dijkstra(start, end) {
+            let distances = {};
+            let previous = {};
+            let nodes = new Set();
+
+            Object.keys(graphNodes).forEach(node => {
+                distances[node] = Infinity;
+                previous[node] = null;
+                nodes.add(node);
+            });
+
+            distances[start] = 0;
+
+            while (nodes.size > 0) {
+                let smallest = Array.from(nodes).reduce((minNode, node) => 
+                    distances[node] < distances[minNode] ? node : minNode, Array.from(nodes)[0]);
+
+                nodes.delete(smallest);
+
+                if (smallest === end) {
+                    let path = [];
+                    let curr = end;
+                    while (curr) {
+                        path.unshift(curr);
+                        curr = previous[curr];
+                    }
+                    return { path, distance: distances[end] };
+                }
+
+                if (distances[smallest] === Infinity) break;
+
+                for (let neighborObj of graphAdjacency[smallest]) {
+                    let alt = distances[smallest] + neighborObj.weight;
+                    if (alt < distances[neighborObj.node]) {
+                        distances[neighborObj.node] = alt;
+                        previous[neighborObj.node] = smallest;
+                    }
+                }
+            }
+            return { path: [], distance: Infinity };
+        }
+
+        // Initial rendering
+        renderTree();
+    </script>
+</body>
+</html>
